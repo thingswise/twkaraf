@@ -13,8 +13,11 @@ archive=${APP_ARCHIVE:-}
 http_proxy_host=${HTTP_PROXY:-}
 http_proxy_port=${HTTP_PROXY_PORT:-3128}
 http_noproxy_host=${HTTP_NOPROXY_HOST:-127.0.0.1,localhost,10.*.*.*,172.17.42.1}
+repo_dst=${REPO_DST:-$wd/repo}
 
 export EXTRA_JAVA_OPTS="$jvmopts"
+# make repo_dst available in child processes
+export repo_dst 
 
 # In case HTTP Proxy is being provided, enable this configuration for both
 # Maven and Java
@@ -60,7 +63,7 @@ function update_bundle_repos() {
   for repo in "${repo_list[@]}"; do
     tgz=$(ls -t $repo|head -1)
     if [ ! -z $tgz ]; then
-      main_dir=$REPO_DST
+      main_dir=$repo_dst
       (mkdir -p $main_dir && cd $main_dir && tar xf $repo/$tgz --keep-newer-files 2>/dev/null)
     fi
   done
